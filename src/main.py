@@ -1,24 +1,32 @@
 from fastapi import FastAPI
+from dotenv import load_dotenv
 from openai import OpenAI
 
-from dotenv import load_dotenv
+from src.models.chat_request import ChatRequest
+from src.utils.prompt_loader import get_system_prompt
 import os
 
-from src.models.chat_request import ChatRequest
-from pathlib import Path
 
-# para cargar var. de ambiente, aún nada implementado con OpenAI
+###     Inicializaciones    ###
+
 load_dotenv()
 app = FastAPI()
-
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+system_prompt = get_system_prompt()
+
+
+###         RestAPI         ###
 
 @app.get("/")
 def root():
     return { "mensaje": "API funcionando" }
 
+@app.get("/systemprompt")
+def root():
+    return { "system_prompt": system_prompt }
+
 @app.post("/chat")
-async def chat(request: ChatRequest):
+def chat(request: ChatRequest):
     response = client.responses.create(
         model="gpt-4.1-mini",
         input=request.prompt
@@ -29,15 +37,3 @@ async def chat(request: ChatRequest):
         "respuesta": response
     }
 
-@app.get("/systemprompt")
-def root():
-    main_prompt = getSystemPrompt()
-
-    return { "system_prompt": main_prompt }
-
-def getSystemPrompt():
-    PROMPT_PATH = Path(__file__).parent.parent / "prompt" / "main_prompt.txt"
-
-    with open(PROMPT_PATH, "r", encoding="utf-8") as f:
-        main_prompt = f.read()
-    return main_prompt
