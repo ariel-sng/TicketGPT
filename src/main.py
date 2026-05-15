@@ -1,16 +1,17 @@
 from fastapi import FastAPI
 from openai import OpenAI
+
 from dotenv import load_dotenv
+import os
 
 from src.models.chat_request import ChatRequest
 from pathlib import Path
 
 # para cargar var. de ambiente, aún nada implementado con OpenAI
 load_dotenv()
-
 app = FastAPI()
 
-#client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 @app.get("/")
 def root():
@@ -18,7 +19,15 @@ def root():
 
 @app.post("/chat")
 async def chat(request: ChatRequest):
-    return { "recibido": request }
+    response = client.responses.create(
+        model="gpt-4.1-mini",
+        input=request.prompt
+    )
+
+    # por ahora que devuelva la respuesta completa del openAI completo
+    return {
+        "respuesta": response
+    }
 
 @app.get("/systemprompt")
 def root():
