@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from openai import OpenAI
 from dotenv import load_dotenv
-import os
+from src.models.chat_request import ChatRequest
 
 # para cargar var. de ambiente, aún nada implementado con OpenAI
 load_dotenv()
@@ -12,4 +12,8 @@ app = FastAPI()
 
 @app.get("/")
 def root():
-    return {"mensaje": "API funcionando"}
+    return { "mensaje": "API funcionando" }
+
+@app.post("/chat")
+async def chat(request: ChatRequest):
+    return { "recibido": request }
