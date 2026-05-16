@@ -5,6 +5,8 @@ from openai import OpenAI
 from src.models.chat_request import ChatRequest
 from src.utils.prompt_loader import get_system_prompt
 from src.utils.logger import log
+from src.utils.openai_service import ask_openai
+ 
 import os
 
 
@@ -32,7 +34,10 @@ def root():
 
 @app.post("/chat")
 def chatear(request: ChatRequest):
-    response = client.responses.create(
+    response = ask_openai(client, system_prompt, request.prompt)
+    return response
+
+    '''response = client.responses.create(
         model="gpt-4.1-mini",
         input=request.prompt
     )
@@ -40,5 +45,5 @@ def chatear(request: ChatRequest):
     # por ahora que devuelva la respuesta completa del openAI completo
     return {
         "respuesta": response
-    }
+    }'''
 
