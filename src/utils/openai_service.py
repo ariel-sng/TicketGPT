@@ -1,6 +1,14 @@
 import json
 import time
+
 from openai import OpenAI
+from pydantic import BaseModel
+from src.models.chat_response_ai import ChatResponse
+
+class ChatResponse(BaseModel):
+    answer: str
+    confidence: float
+    recommended_actions: list[str]
 
 
 # precio aproximado de GPT-4.1-mini (USD por 1 millón de tokens)
@@ -20,51 +28,14 @@ def ask_openai(client: OpenAI, system_prompt: str, user_prompt: str) -> dict:
 
     # por ahora, implemento gpt-4.1-mini
 
-    response = client.responses.create(
+    response = client.responses.parse(
         model="gpt-4.1-mini",
         temperature=0.1,
         input=[
-            {
-                "role": "system",
-                "content": system_prompt
-            },
-            {
-                "role": "user",
-                "content": user_prompt
-            }
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt},
         ],
-        text={
-            "format": {
-                "type": "json_schema",
-                "name": "chat_response",
-                "schema": {
-                    # no sabía que podía limitar por el propio JSON cosas de la respuesta
-                    "type": "object",
-                    "additionalProperties": False,
-                    "properties": {
-                        "answer": {
-                            "type": "string"
-                        },
-                        "confidence": {
-                            "type": "number",
-                            "minimum": 0,
-                            "maximum": 1
-                        },
-                        "recommended_actions": {
-                            "type": "array",
-                            "items": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "required": [
-                        "answer",
-                        "confidence",
-                        "recommended_actions"
-                    ]
-                }
-            }
-        }
+        text_format=ChatResponse
     )
 
     latency_ms = round((time.perf_counter() - start_time) * 1000, 2)
