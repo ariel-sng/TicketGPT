@@ -2,14 +2,7 @@ import json
 import time
 
 from openai import OpenAI
-from pydantic import BaseModel
 from src.models.chat_response_ai import ChatResponse
-
-class ChatResponse(BaseModel):
-    answer: str
-    confidence: float
-    recommended_actions: list[str]
-
 
 # precio aproximado de GPT-4.1-mini (USD por 1 millón de tokens)
 # fuente: https://openrouter.ai/openai/gpt-4.1-mini
