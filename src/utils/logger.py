@@ -4,7 +4,7 @@ import json
 
 
 def log(data: dict, file_name: str = "metrics.jsonl") -> None:
-    '''Log simple que recibe un diccionario de Python y lo guarda en un archivo'''
+    '''Recibe un diccionario de Python y lo guarda en un archivo formateado como JSON'''
     log_path = Path(__file__).parent.parent.parent / "metrics" / file_name
 
     # para crear la carpeta si no existe

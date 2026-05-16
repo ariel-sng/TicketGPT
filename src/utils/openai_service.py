@@ -3,6 +3,7 @@ import time
 
 from openai import OpenAI
 from src.models.chat_response_ai import ChatResponse
+from src.utils.logger import log
 
 # precio aproximado de GPT-4.1-mini (USD por 1 millón de tokens)
 # fuente: https://openrouter.ai/openai/gpt-4.1-mini
@@ -36,10 +37,12 @@ def ask_openai(client: OpenAI, system_prompt: str, user_prompt: str) -> dict:
     result = json.loads(response.output_text)
 
     total_tokens, estimated_cost_usd = get_price_and_tokens(response)
-
-    result["tokens_used"] = total_tokens
-    result["estimated_cost_usd"] = round(estimated_cost_usd, 8)
-    result["latency_ms"] = latency_ms
+    
+    register = {}
+    register["tokens_used"] = total_tokens
+    register["estimated_cost_usd"] = round(estimated_cost_usd, 8)
+    register["latency_ms"] = latency_ms
+    log(register)
 
     return result
 
