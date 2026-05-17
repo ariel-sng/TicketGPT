@@ -26,5 +26,6 @@ def log(data: dict, file_name: str = "metrics.csv") -> None:
 
         writer.writerow(row)
     
+    # imprime los datos guardados
     for key, value in row.items():
         print(f"{key:20} |  {value}") 
