@@ -39,9 +39,11 @@ def ask_openai(client: OpenAI, system_prompt: str, user_prompt: str) -> dict:
     total_tokens, estimated_cost_usd = get_price_and_tokens(response)
     
     register = {}
-    register["tokens_used"] = total_tokens
-    register["estimated_cost_usd"] = round(estimated_cost_usd, 8)
+    register["tokens_prompt"] = response.usage.input_tokens
+    register["tokens_completions"] = response.usage.output_tokens
+    register["total_tokens"] = total_tokens
     register["latency_ms"] = latency_ms
+    register["estimated_cost_usd"] = round(estimated_cost_usd, 8)
     log(register)
 
     return result
