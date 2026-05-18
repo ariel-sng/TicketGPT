@@ -86,7 +86,7 @@ Al ser un proyecto que se centra en el uso de la IA, no se incorporaron mecanism
 
 En una evolución futura del proyecto completo podrían incorporar las siguientes mejoras:
 
-- Manejo básico de excepciones para errores de red o validación.
+- Mejor manejo de excepciones para errores de red o validación
 - Separación de configuración sensible mediante variables de entorno.
 - Aplicación de un patrón de diseño, como Strategy, para abstraer el proveedor de inteligencia artificial y permitir implementar fácilmente distintas soluciones (por ejemplo, OpenAI, Anthropic o modelos locales).
 - Automatización de tests en un pipeline de integración continua.
