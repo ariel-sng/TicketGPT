@@ -16,7 +16,7 @@ def log(data: dict, file_name: str = "metrics.csv") -> None:
 
     file_exists = log_path.exists()
 
-    # a falta de BBDD no relacional, se abre un archivo en lectura y se modifica
+    # a falta de BBDD, se abre un archivo en lectura y se modifica
     with open(log_path, "a", newline="", encoding="utf-8") as cvs_file:
         writer = csv.DictWriter(cvs_file, fieldnames=row.keys())
 

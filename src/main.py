@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from dotenv import load_dotenv
-from openai import OpenAI
+from openai import OpenAI, OpenAIError
+from fastapi import HTTPException
 
 from src.models.chat_request import ChatRequest
 from src.utils.prompt_loader import get_system_prompt
@@ -25,7 +26,21 @@ def root():
 
 @app.post("/chat")
 def chatear(request: ChatRequest):
-    response, latency = ask_openai(client, system_prompt, request.prompt)
-    log_metrics(response, latency)
-    result = response.output_parsed.model_dump()
-    return result
+    try:
+
+        response, latency = ask_openai(client, system_prompt, request.prompt)
+        log_metrics(response, latency)
+        result = response.output_parsed
+        return result
+
+    except OpenAIError as e:
+        raise HTTPException(
+            status_code=502,
+            detail=f"Error al comunicarse con OpenAI: {e}"
+        )
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error interno del servidor: {e}"
+        )

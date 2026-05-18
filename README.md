@@ -20,7 +20,7 @@ TicketGPT/
 │── .env
 │── .gitignore
 │── requirements.txt
-│── README.md
+└── README.md
 ```
 
 ## 1. Clonar el repositorio
