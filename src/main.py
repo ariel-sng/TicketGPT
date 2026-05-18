@@ -23,13 +23,6 @@ system_prompt = get_system_prompt()
 def root():
     return { "mensaje": "API funcionando" }
 
-
-@app.get("/system_prompt")
-def root():    
-    # Simplemente está por motivos didácticos ver el system_prompt, en la vida real no lo expondría
-    return { "system_prompt": system_prompt }
-
-
 @app.post("/chat")
 def chatear(request: ChatRequest):
     response, latency = ask_openai(client, system_prompt, request.prompt)

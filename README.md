@@ -136,3 +136,10 @@ Dejo subido el `.vscode/launch.json` por si alguno quiere hacer un debug al cód
 - Uvicorn
 - OpenAI
 - python-dotenv
+
+### Test
+
+Para ejecutar los test unitarios, ejecute el siguiente comando:
+```bash
+python -m unittest src.test.test
+```
