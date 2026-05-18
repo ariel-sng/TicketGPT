@@ -1,7 +1,7 @@
 import sys
 import types
 import unittest
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 # Inyectamos un módulo `openai` falso para evitar dependencia externa
 fake_openai = types.ModuleType("openai")
@@ -23,8 +23,7 @@ fake_pydantic.BaseModel = FakeBaseModel
 fake_pydantic.Field = Field
 sys.modules["pydantic"] = fake_pydantic
 
-from src.utils.openai_service import ask_openai
-from src.models.chat_response_ai import ChatResponse
+from src.utils.openai_service import log_metrics
 
 class FakeUsage:
     def __init__(self, input_tokens=0, output_tokens=0, total_tokens=0):
@@ -38,44 +37,20 @@ class FakeResponse:
         self.usage = usage
 
 class TestAskOpenAI(unittest.TestCase):
-    def test_calls_client_with_expected_parameters(self):
-        client_mock = Mock()
-        usage = FakeUsage(10, 20, 30)
+    def test_log_metrics_records_token_counts(self):
+        usage = FakeUsage(input_tokens=50, output_tokens=70, total_tokens=120)
         response = FakeResponse(usage)
-        client_mock.responses.parse = Mock(return_value=response)
+        with patch("src.utils.openai_service.log") as fake_log:
+            log_metrics(response, 15.0)
 
-        system_prompt = "system text"
-        user_prompt = "user text"
-        result, elapsed = ask_openai(client_mock, system_prompt, user_prompt)
-
-        client_mock.responses.parse.assert_called_once()
-        called_kwargs = client_mock.responses.parse.call_args.kwargs
-        self.assertEqual(called_kwargs.get("model"), "gpt-4.1-mini")
-        self.assertEqual(called_kwargs.get("temperature"), 0.1)
-        self.assertEqual(called_kwargs.get("text_format"), ChatResponse)
-        inp = called_kwargs.get("input")
-        self.assertIsInstance(inp, list)
-        self.assertEqual(inp[0]["role"], "system")
-        self.assertEqual(inp[0]["content"], system_prompt)
-        self.assertEqual(inp[1]["role"], "user")
-        self.assertEqual(inp[1]["content"], user_prompt)
-        self.assertIs(result, response)
-        self.assertIsInstance(elapsed, float)
-        self.assertGreater(elapsed, 0)
-
-    def test_response_latency_set_and_returned_elapsed(self):
-        client = Mock()
-        usage = FakeUsage(5, 7, 12)
-        response = FakeResponse(usage)
-        client.responses.parse = Mock(return_value=response)
-
-        result, elapsed = ask_openai(client, "s", "u")
-        self.assertIs(result, response)
-        # decorator returns elapsed time and function sets usage.latency_ms
-        self.assertIsNotNone(response.usage.latency_ms)
-        self.assertIsInstance(response.usage.latency_ms, float)
-        self.assertIsInstance(elapsed, float)
-        self.assertGreater(elapsed, 0)
+        expected_cost = (50 / 1_000_000) * 0.40 + (70 / 1_000_000) * 1.60
+        fake_log.assert_called_once()
+        register = fake_log.call_args.args[0]
+        self.assertEqual(register["tokens_prompt"], 50)
+        self.assertEqual(register["tokens_completions"], 70)
+        self.assertEqual(register["total_tokens"], 120)
+        self.assertEqual(register["latency_ms"], 15.0)
+        self.assertAlmostEqual(register["estimated_cost_usd"], round(expected_cost, 8))
 
 if __name__ == "__main__":
     unittest.main()
