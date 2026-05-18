@@ -10,18 +10,34 @@ Práctica de AI Engineering
 
 ## Estructura del proyecto
 
-```text
+<pre>
 TicketGPT/
-│── src/
-│   └── main.py
-│── .vscode/
-│   └── launch.json
-│── .venv/
 │── .env
 │── .gitignore
+│── README.md
 │── requirements.txt
-└── README.md
-```
+│── .venv/
+│── .vscode/
+│   └── launch.json
+│── metrics/
+│   ├── metrics.csv
+│── prompt/
+│   ├── <a href="./prompt/main_prompt.txt">main_prompt.txt</a> 
+│── reports/
+│   ├── <a href="./reports/PI_report_en.md">PI_report_en.md</a>
+└── src/
+    ├── main.py
+    ├── models/
+    │   ├── chat_request.py
+    │   └── chat_response_ai.py
+    ├── test/
+    │   └── test.py
+    └── utils/
+        ├── latency_decorator.py
+        ├── logger.py
+        ├── openai_service.py
+        └── prompt_loader.py
+</pre>
 
 ## 1. Clonar el repositorio
 
